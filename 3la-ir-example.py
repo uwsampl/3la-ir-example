@@ -63,6 +63,7 @@ def generate_random_tensor(ty):
 
 
 mod = get_lstm(1, 1, 'float32')
+p = Prelude(mod)
 
 input_dict = {}
 for var in mod['main'].params[:-1]:
@@ -75,9 +76,9 @@ for var in mod['main'].params[:-1]:
     else:
         assert False
 
-input_dict['input_list'] = [
+input_dict['input_list'] = p.cons(
     generate_random_tensor(mod['main'].params[-1].type_annotation.args[0]),
-]
+    p.nil())
 
 ex = relay.create_executor(mod=mod)
 out = ex.evaluate()(**input_dict)
