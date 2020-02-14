@@ -8,6 +8,12 @@ from tvm.relay.testing.lstm import lstm_cell
 import numpy as np
 
 
+def generate_random_tensor(ty):
+    return tvm.nd.array(
+        np.random.rand(*[int(int_imm)
+                         for int_imm in ty.shape]).astype(ty.dtype))
+
+
 def get_lstm(batch_size, num_hidden, dtype):
     '''Returns a module where the main() function is an LSTM RNN,
     returning a tuple of two items where the first is the
@@ -44,7 +50,7 @@ def get_lstm(batch_size, num_hidden, dtype):
                                        relay.TupleGetItem(cell_out, 1)
                                    ])), state_var_type)
     fold_res = relay.Var('fold_res', state_var_type)
-    mod['main'] = relay.Function(
+    mod['rnn'] = relay.Function(
         [i2h_weight, i2h_bias, h2h_weight, h2h_bias, init_states, input_list],
         relay.Let(
             fold_res,
@@ -54,31 +60,31 @@ def get_lstm(batch_size, num_hidden, dtype):
                 p.rev(relay.TupleGetItem(fold_res, 0)),
                 relay.TupleGetItem(fold_res, 1)
             ])), state_var_type)
+
+    mod['main'] = relay.Function(
+        [],
+        relay.Call(mod.get_global_var('rnn'), [
+            relay.const(generate_random_tensor(weight_type)),
+            relay.const(generate_random_tensor(bias_type)),
+            relay.const(generate_random_tensor(weight_type)),
+            relay.const(generate_random_tensor(bias_type)),
+            relay.Tuple([
+                relay.const(generate_random_tensor(input_type)),
+                relay.const(generate_random_tensor(input_type))
+            ]),
+            p.cons(relay.const(generate_random_tensor(input_type)), p.nil())
+        ]))
     return mod
 
 
-def generate_random_tensor(ty):
-    return np.random.rand(*[int(int_imm)
-                            for int_imm in ty.shape]).astype(ty.dtype)
+def main():
+    mod = get_lstm(1, 1, 'float32')
+
+    input_dict = {}
+
+    ex = relay.create_executor(mod=mod)
+    out = ex.evaluate()(**input_dict)
 
 
-mod = get_lstm(1, 1, 'float32')
-p = Prelude(mod)
-
-input_dict = {}
-for var in mod['main'].params[:-1]:
-    ty = var.checked_type
-    if type(ty) is relay.TensorType:
-        input_dict[var.name_hint] = generate_random_tensor(ty)
-    elif type(ty) is relay.TupleType:
-        input_dict[var.name_hint] = tuple(
-            generate_random_tensor(ty) for ty in ty.fields)
-    else:
-        assert False
-
-input_dict['input_list'] = p.cons(
-    generate_random_tensor(mod['main'].params[-1].type_annotation.args[0]),
-    p.nil())
-
-ex = relay.create_executor(mod=mod)
-out = ex.evaluate()(**input_dict)
+if __name__ == '__main__':
+    main()
