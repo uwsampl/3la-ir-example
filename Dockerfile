@@ -40,7 +40,7 @@ COPY ./requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 
 ## Set up example script
-
+WORKDIR /root
 COPY ./3la-ir-example.py ./3la-ir-example.py
 
-CMD ["python3 3la-ir-example.py"]
+CMD ["python3", "3la-ir-example.py"]
