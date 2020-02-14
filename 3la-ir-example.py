@@ -82,8 +82,14 @@ def main():
 
     input_dict = {}
 
-    ex = relay.create_executor(mod=mod)
-    out = ex.evaluate()(**input_dict)
+    USE_EXECUTOR = True
+    if (USE_EXECUTOR):
+        ex = relay.create_executor(mod=mod)
+        out = ex.evaluate()(**input_dict)
+    else:
+        # TODO manually scheduling, lowering, building the code; do people still
+        # do this from Relay? or does everyone just use the evaluators?
+        pass
 
 
 if __name__ == '__main__':
