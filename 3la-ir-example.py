@@ -18,7 +18,7 @@ def get_lstm(batch_size, num_hidden, dtype):
     '''Returns a module where the main() function is an LSTM RNN,
     returning a tuple of two items where the first is the
     list of outputs and the second is the final hidden state'''
-    mod = relay.Module()
+    mod = tvm.IRModule()
     p = Prelude(mod)
     input_type = relay.TensorType((batch_size, num_hidden), dtype)
     weight_type = relay.TensorType((4 * num_hidden, num_hidden), dtype)
