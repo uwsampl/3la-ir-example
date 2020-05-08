@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Build and run Docker image
 
 on:
   push:
@@ -15,4 +15,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag 3la-ir-example:$(date +%s)
+      run: docker build . --file Dockerfile --tag 3la-ir-example
+    - name: Run the Docker image
+      run: docker run -it 3la-ir-example
