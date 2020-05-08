@@ -1,3 +1,5 @@
+![Build and run Docker image](https://github.com/uwsampl/3la-ir-example/workflows/Build%20and%20run%20Docker%20image/badge.svg)
+
 This Docker container first builds a version of [TVM](https://github.com/apache/incubator-tvm) which is modified to print out the different TVM IRs at different stages of the build process.
 It then runs a simple LSTM through TVM as an example.
 
