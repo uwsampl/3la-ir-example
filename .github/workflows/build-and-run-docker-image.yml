@@ -17,4 +17,4 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag 3la-ir-example
     - name: Run the Docker image
-      run: docker run -it 3la-ir-example
+      run: docker run 3la-ir-example
