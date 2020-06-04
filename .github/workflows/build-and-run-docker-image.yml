@@ -17,4 +17,9 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag 3la-ir-example
     - name: Run the Docker image
-      run: docker run 3la-ir-example
+      run: docker run 3la-ir-example > printed-ir.txt 2>&1
+    - uses: actions/upload-artifact@v2
+      with:
+        name: printed-ir.txt
+        path: printed-ir.txt
+
